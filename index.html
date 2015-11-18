@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+<meta charset="utf-8">
 <title>Karten-Suche</title>
 
 <link rel="stylesheet" href="http://openlayers.org/en/v3.11.0/css/ol.css" type="text/css">
@@ -12,41 +12,58 @@
 <body>
   <form id="searchform">
       <input id="textfield" list="sugg" name="search" size="80" type="text" placeholder="Search, e.g. 'Vienna', 'Karlsplatz 13, Wien'">
-      <datalist id="sugg">
-
-      </datalist>
+      <datalist id="sugg"></datalist>
       <input type="submit" value="Search">
-
   </form>
-<div id="map" class="map"></div>
+
+  <form id="relocate">
+      <input type="button" name="Location" value="Reset location" onclick="JavaScript:relocate();">
+  </form>
+
+  <div id="map" class="map"></div>
+
 
 <script>
+var marker = new ol.Feature();
 var map = new ol.Map({
-  layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
-    })
-  ],
-  controls: ol.control.defaults({
-    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
-      collapsible: false
-    })
-  }),
   target: 'map',
-  view: new ol.View({
-    center: [0, 0],
-    zoom: 13
-  })
-});
+  layers: [
+      new ol.layer.Tile({
+      source: new ol.source.OSM()
+      }),
+      new ol.layer.Vector({
+    	source: new ol.source.Vector({
+    	features: [marker]
+    	}),
+
+      style: new ol.style.Style ({
+      image: new ol.style.Icon(({
+          anchor: [0.5, 46],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'pixels',
+      src: 'http://student.ifip.tuwien.ac.at/geoweb/2015/g03/homepage/map_marker_green.png'
+      }))
+      })
+      })
+        ],
+
+      view: new ol.View({
+      center: ol.proj.transform([16.373, 48.208], 'EPSG:4326', 'EPSG:3857'), zoom: 15,
+      })
+      });
 
 
-var geolocation = new ol.Geolocation({
-  projection: map.getView().getProjection(),
-  tracking: true
-});
-geolocation.once('change:position', function(evt) {
-  map.getView().setCenter(geolocation.getPosition());
-});
+function relocate() {
+  var geolocation = new ol.Geolocation({projection: 'EPSG:3857'});
+  geolocation.setTracking(true);
+  geolocation.once('change:position', function(evt) {
+  geolocation.setTracking(false);
+
+  map.getView().setCenter(geolocation.getPosition(), map.getSize(), { nearest: true, Zoom: 15 });
+  marker.setGeometry(new ol.geom.Point(map.getView().getCenter()));
+  });
+  }
+  relocate();
 
 var form = document.getElementById('searchform');
 form.onsubmit = function(evt) {
@@ -69,27 +86,11 @@ form.onsubmit = function(evt) {
           map.getView().setCenter(ol.proj.fromLonLat([
             parseFloat(first.lon, 10),
             parseFloat(first.lat, 10)
-          ]));
-
-
-    }
-  };
-  xhr.send();
+]));
+}
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+xhr.send();
+};
 
 </script>
 </body>
