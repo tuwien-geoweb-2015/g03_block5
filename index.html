@@ -13,12 +13,13 @@
   <form id="searchform">
       <input id="textfield" list="sugg" name="search" size="80" type="text" placeholder="Search, e.g. 'Vienna', 'Karlsplatz 13, Wien'">
       <datalist id="sugg"></datalist>
-      <input type="submit" value="Search">
+      <input type="submit" value="Suche">
+      <form id="relocate">
+          <input type="button" name="Location" value="Ab nach Hause!" onclick="JavaScript:relocate();">
+      </form>
   </form>
 
-  <form id="relocate">
-      <input type="button" name="Location" value="Reset location" onclick="JavaScript:relocate();">
-  </form>
+
 
   <div id="map" class="map"></div>
 
